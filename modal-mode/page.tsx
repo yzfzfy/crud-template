@@ -1,15 +1,16 @@
-'use client';
-import React, { useRef, useState } from 'react';
-import { Space, App, Dropdown, Button, Popconfirm, Tabs } from 'antd';
-import { EllipsisOutlined } from '@ant-design/icons';
-import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { listRequest } from './api';
-import { PlusOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { columns } from './columns';
-import FormModal from './form-modal';
+"use client";
+import React, { useRef, useState } from "react";
+import { Space, App, Dropdown, Button, Popconfirm, Tabs } from "antd";
+import { EllipsisOutlined } from "@ant-design/icons";
+import { ProTable, TableDropdown } from "@ant-design/pro-components";
+import type { ActionType, ProColumns } from "@ant-design/pro-components";
+import { listRequest } from "./api";
+import { PlusOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { MODAL_MODE, TModalMode } from "./form-modal/types";
+import { columns } from "./columns";
+import FormModal from "./form-modal";
 
 const Page: React.FC = () => {
     const actionRef = useRef<ActionType>(null);
@@ -17,8 +18,8 @@ const Page: React.FC = () => {
     // 编辑行数据的state
     const [editRow, setEditRow] = useState(null);
     const [open, setOpen] = useState(false);
-    const [mode, setMode] = useState<'add' | 'edit' | 'view'>('add');
-    const [otherParams, setOtherParams] = useState({ reviewStatus: 'pending' });
+    const [mode, setMode] = useState<"add" | "edit" | "view">("add");
+    const [otherParams, setOtherParams] = useState({ reviewStatus: "pending" });
 
     const router = useRouter();
 
@@ -46,18 +47,20 @@ const Page: React.FC = () => {
         };
     };
 
-    const handleEdit = (record: any) => {
-        setMode('edit');
-        //  这里可以做一些record数据的格式化
-        setEditRow({ ...record });
+    const openModal = (mode: TModalMode, values = null) => {
+        setMode(mode);
+        setEditRow(values);
         setOpen(true);
     };
 
-    const handleView = (record: any) => {
-        setMode('view');
+    const handleEdit = (record: any) => {
         //  这里可以做一些record数据的格式化
-        setEditRow({ ...record });
-        setOpen(true);
+        openModal(MODAL_MODE.EDIT, { ...record });
+    };
+
+    const handleView = (record: any) => {
+        //  这里可以做一些record数据的格式化
+        openModal(MODAL_MODE.VIEW, { ...record });
     };
 
     const handleCancel = () => {
@@ -73,11 +76,11 @@ const Page: React.FC = () => {
 
     const finalColumns = columns.concat([
         {
-            title: '操作',
-            key: 'action',
+            title: "操作",
+            key: "action",
             width: 180,
             hideInSearch: true,
-            fixed: 'right',
+            fixed: "right",
             render: (_: any, record: any) => {
                 const actionMap = {
                     edit: handleEdit,
@@ -86,44 +89,44 @@ const Page: React.FC = () => {
                 };
                 const case1 = [
                     {
-                        key: 'edit',
-                        label: '编辑',
+                        key: "edit",
+                        label: "编辑",
                     },
                     {
-                        key: 'delete',
-                        label: '删除',
+                        key: "delete",
+                        label: "删除",
                     },
                     {
-                        key: 'copy',
-                        label: '复制',
+                        key: "copy",
+                        label: "复制",
                     },
                     {
-                        key: 'view',
-                        label: '查看',
+                        key: "view",
+                        label: "查看",
                     },
                 ];
                 const case2 = [
                     {
-                        key: 'copy',
-                        label: '复制',
+                        key: "copy",
+                        label: "复制",
                     },
                     {
-                        key: 'view',
-                        label: '查看',
+                        key: "view",
+                        label: "查看",
                     },
                 ];
                 const case3 = [
                     {
-                        key: 'edit',
-                        label: '编辑',
+                        key: "edit",
+                        label: "编辑",
                     },
                     {
-                        key: 'copy',
-                        label: '复制',
+                        key: "copy",
+                        label: "复制",
                     },
                     {
-                        key: 'view',
-                        label: '查看',
+                        key: "view",
+                        label: "查看",
                     },
                 ];
 
@@ -135,7 +138,11 @@ const Page: React.FC = () => {
                                     key={item.key}
                                     size="small"
                                     type="link"
-                                    onClick={() => actionMap[item.key as keyof typeof actionMap](record)}
+                                    onClick={() =>
+                                        actionMap[
+                                            item.key as keyof typeof actionMap
+                                        ](record)
+                                    }
                                 >
                                     {item.label}
                                 </Button>
@@ -146,11 +153,18 @@ const Page: React.FC = () => {
                             <Dropdown
                                 menu={{
                                     items: case1.slice(3),
-                                    onClick: (item) => actionMap[item.key as keyof typeof actionMap](record),
+                                    onClick: (item) =>
+                                        actionMap[
+                                            item.key as keyof typeof actionMap
+                                        ](record),
                                 }}
                                 placement="bottomRight"
                             >
-                                <Button size="small" type="link" icon={<EllipsisOutlined />} />
+                                <Button
+                                    size="small"
+                                    type="link"
+                                    icon={<EllipsisOutlined />}
+                                />
                             </Dropdown>
                         )}
                     </>
@@ -167,16 +181,16 @@ const Page: React.FC = () => {
     // 表格的title处若有tab切换重新请求接口则添加Tab配置
     const tabItems = [
         {
-            key: 'pending',
-            label: '待审核',
+            key: "pending",
+            label: "待审核",
         },
         {
-            key: 'approved',
-            label: '已审核',
+            key: "approved",
+            label: "已审核",
         },
         {
-            key: 'all',
-            label: '全部',
+            key: "all",
+            label: "全部",
         },
     ];
 
@@ -198,13 +212,13 @@ const Page: React.FC = () => {
                 }
                 params={otherParams}
                 rowKey="id"
-                scroll={{ x: 'max-content' }}
+                scroll={{ x: "max-content" }}
                 toolBarRender={() => [
                     <Button
                         key="add"
                         type="primary"
                         onClick={() => {
-                            setMode('add');
+                            setMode("add");
                             setOpen(true);
                         }}
                     >
@@ -224,13 +238,13 @@ const Page: React.FC = () => {
                 maskClosable={false}
                 mode={mode}
                 okButtonProps={{
-                    disabled: mode === 'view',
+                    disabled: mode === "view",
                 }}
                 contentProps={{ initialValues: editRow }}
                 styles={{
                     body: {
-                        height: '500px',
-                        overflow: 'auto',
+                        height: "500px",
+                        overflow: "auto",
                     },
                 }}
             />

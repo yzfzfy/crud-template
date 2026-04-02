@@ -1,18 +1,24 @@
-import type { ModalProps } from 'antd';
+import type { ModalProps } from "antd";
 
-type TMode = 'add' | 'edit' | 'view';
+export const MODAL_MODE = {
+    NEW: "new",
+    EDIT: "edit",
+    VIEW: "view",
+} as const;
+
+export type TModalMode = (typeof MODAL_MODE)[keyof typeof MODAL_MODE];
 
 interface ICustomProps {
-    mode?: TMode;
+    mode?: TModalMode;
     customFooterRender?: Function;
     okAuthKey?: string;
     contentProps?: Record<string, any>;
     onOk: (event: React.MouseEvent<HTMLElement>, additionalInfo: any) => void;
 }
 
-export type IProps = ICustomProps & Omit<ModalProps, 'onOk'>;
+export type IProps = ICustomProps & Omit<ModalProps, "onOk">;
 
 export interface IModalContentProps {
-    mode: TMode;
+    mode: TModalMode;
     initialValues?: any;
 }
